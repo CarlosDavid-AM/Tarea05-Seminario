@@ -1,11 +1,121 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    <h1>Gráfico</h1>
-</body>
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gráficos estadísticos — Chart.js</title>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 1.5rem;
+        line-height: 1.5;
+      }
+      
+      h1 {
+        font-size: 1.25rem;
+        margin-top: 0;
+      }
+      h2 {
+        font-size: 1.05rem;
+        margin: 0 0 0.75rem;
+      }
+      .inputs-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+      }
+      .inputs-grid label {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        font-size: 0.85rem;
+      }
+      .inputs-grid input {
+        padding: 0.4rem 0.5rem;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+      canvas {
+        max-height: 320px;
+      }
+        
+    </style>
+  </head>
+  <body>
+    <h1>Gráficos estadísticos (Chart.js)</h1>
+
+    <section aria-labelledby="titulo-grafico1">
+      <h2 id="titulo-grafico1">Gráfico 1 — Lenguajes de programación</h2>
+      <p>
+        Eje X: cinco lenguajes. Eje Y: valores numéricos introducidos en las cajas de texto.
+      </p>
+      <div class="inputs-grid" id="contenedor-inputs"></div>
+      <canvas id="lienzo1" aria-label="Gráfico de barras por lenguaje"></canvas>
+    </section>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+      
+      const LENGUAJES = ["Python", "JavaScript", "Java", "C#", "Go"];
+
+      document.addEventListener("DOMContentLoaded", function () {
+        const contenedorInputs = document.getElementById("contenedor-inputs");
+        const inputs = [];
+
+        LENGUAJES.forEach((nombre, i) => {
+          const label = document.createElement("label");
+          label.innerHTML = `<span>${nombre}</span>`;
+          const input = document.createElement("input");
+          input.type = "number";
+          input.step = "any";
+          input.min = "0";
+          input.value = String(10 + i * 3);
+          input.dataset.index = String(i);
+          input.addEventListener("input", actualizarGrafico1);
+          inputs.push(input);
+          label.appendChild(input);
+          contenedorInputs.appendChild(label);
+        });
+
+        const ctx1 = document.getElementById("lienzo1");
+        const grafico1 = new Chart(ctx1, {
+          type: "bar",
+          data: {
+            labels: [...LENGUAJES],
+            datasets: [
+              {
+                label: "",
+                data: inputs.map((inp) => parseFloat(inp.value) || 0),
+                backgroundColor: "rgba(54, 162, 235, 0.6)",
+                borderColor: "rgba(54, 162, 235, 1)",
+                borderWidth: 2,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: { display: false },
+            },
+            scales: {
+              y: { beginAtZero: true },
+            },
+          },
+        });
+
+        function actualizarGrafico1() {
+          grafico1.data.datasets[0].data = inputs.map(
+            (inp) => parseFloat(inp.value) || 0
+          );
+          grafico1.update();
+        }
+
+        
+      });
+    </script>
+  </body>
 </html>
