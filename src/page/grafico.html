@@ -56,6 +56,15 @@
       <canvas id="lienzo1" aria-label="Gráfico de barras por lenguaje"></canvas>
     </section>
 
+    <section aria-labelledby="titulo-grafico2">
+      <h2 id="titulo-grafico2">Gráfico 2 — Días de la semana (datos desde JSON)</h2>
+      <p>
+        Eje X: días de la semana. Eje Y: valores leídos del archivo datos-semana.json
+      </p>
+      <p id="error-json" hidden></p>
+      <canvas id="lienzo2" aria-label="Gráfico de línea por día de la semana"></canvas>
+    </section>
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
@@ -114,7 +123,69 @@
           grafico1.update();
         }
 
+          const DIAS_SEMANA = [
+          "Lunes",
+          "Martes",
+          "Miércoles",
+          "Jueves",
+          "Viernes",
+          "Sábado",
+          "Domingo",
+        ];
         
+        const ctx2 = document.getElementById("lienzo2");
+        const errorEl = document.getElementById("error-json");
+
+        const grafico2 = new Chart(ctx2, {
+          type: "line",
+          data: {
+            labels: [],
+            datasets: [
+              {
+                label: "",
+                data: [],
+                fill: false,
+                tension: 0.2,
+                borderColor: "rgba(75, 192, 192, 1)",
+                backgroundColor: "rgba(75, 192, 192, 0.2)",
+                borderWidth: 2,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: { display: false },
+            },
+            scales: {
+              y: { beginAtZero: true },
+            },
+          },
+        });
+
+        fetch("datos-semana.json")
+          .then((res) => {
+            if (!res.ok) throw new Error("No se pudo cargar datos-semana.json");
+            return res.json();
+          })
+          .then((json) => {
+            const valores = json.valores;
+            if (!Array.isArray(valores) || valores.length !== DIAS_SEMANA.length) {
+              throw new Error(
+                "El JSON debe incluir un array \"valores\" con 7 números (uno por día)."
+              );
+            }
+            grafico2.data.labels = [...DIAS_SEMANA];
+            grafico2.data.datasets[0].data = valores.map((v) =>
+              typeof v === "number" ? v : parseFloat(v) || 0
+            );
+            grafico2.update();
+            errorEl.hidden = true;
+          })
+          .catch((err) => {
+            errorEl.textContent = err.message || String(err);
+            errorEl.hidden = false;
+          });
       });
     </script>
   </body>
