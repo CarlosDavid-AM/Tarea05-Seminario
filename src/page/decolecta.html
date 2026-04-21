@@ -13,18 +13,65 @@
         <input id="ruc" name="ruc" type="text" required />
         <button type="submit">Fetch</button>
     </form>
+    <table>
+        <thead>
+            <tr>
+                <th>Razon social</th>
+                <th>Numero documento</th>
+                <th>Estado</th>
+                <th>Condicion</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td id="ruc-razon-social"></td>
+                <td id="ruc-numero-documento"></td>
+                <td id="ruc-estado"></td>
+                <td id="ruc-condicion"></td>
+            </tr>
+        </tbody>
+    </table>
 
     <form id="dni-form">
         <label for="dni">DNI:</label>
         <input id="dni" name="dni" type="text" required />
         <button type="submit">Fetch DNI</button>
     </form>
+    <table>
+        <thead>
+            <tr>
+                <th>Nombres</th>
+                <th>Apellido paterno</th>
+                <th>Apellido materno</th>
+                <th>Nombre completo</th>
+                <th>Numero documento</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td id="dni-first-name"></td>
+                <td id="dni-first-last-name"></td>
+                <td id="dni-second-last-name"></td>
+                <td id="dni-full-name"></td>
+                <td id="dni-document-number"></td>
+            </tr>
+        </tbody>
+    </table>
 
     <script>
         const form = document.getElementById("ruc-form");
         const rucInput = document.getElementById("ruc");
+        const razonSocialCell = document.getElementById("ruc-razon-social");
+        const numeroDocumentoCell = document.getElementById("ruc-numero-documento");
+        const estadoCell = document.getElementById("ruc-estado");
+        const condicionCell = document.getElementById("ruc-condicion");
         const dniForm = document.getElementById("dni-form");
         const dniInput = document.getElementById("dni");
+        const dniFirstNameCell = document.getElementById("dni-first-name");
+        const dniFirstLastNameCell = document.getElementById("dni-first-last-name");
+        const dniSecondLastNameCell = document.getElementById("dni-second-last-name");
+        const dniFullNameCell = document.getElementById("dni-full-name");
+        const dniDocumentNumberCell = document.getElementById("dni-document-number");
 
         form.addEventListener("submit", async function (event) {
             // 1) Evitar que el formulario recargue la página (comportamiento por defecto)
@@ -48,6 +95,10 @@
                 // 5) Parsear JSON; si el proxy devolvió error o texto no JSON, fallará aquí
                 const data = await response.json();
                 console.log(data);
+                razonSocialCell.textContent = data.razon_social ?? "";
+                numeroDocumentoCell.textContent = data.numero_documento ?? "";
+                estadoCell.textContent = data.estado ?? "";
+                condicionCell.textContent = data.condicion ?? "";
             } catch (error) {
                 console.error(error);
             }
@@ -74,6 +125,11 @@
                 // 5) Parsear y mostrar en consola
                 const data = await response.json();
                 console.log(data);
+                dniFirstNameCell.textContent = data.first_name ?? "";
+                dniFirstLastNameCell.textContent = data.first_last_name ?? "";
+                dniSecondLastNameCell.textContent = data.second_last_name ?? "";
+                dniFullNameCell.textContent = data.full_name ?? "";
+                dniDocumentNumberCell.textContent = data.document_number ?? "";
             } catch (error) {
                 console.error(error);
             }
