@@ -14,9 +14,17 @@
         <button type="submit">Fetch</button>
     </form>
 
+    <form id="dni-form">
+        <label for="dni">DNI:</label>
+        <input id="dni" name="dni" type="text" required />
+        <button type="submit">Fetch DNI</button>
+    </form>
+
     <script>
         const form = document.getElementById("ruc-form");
         const rucInput = document.getElementById("ruc");
+        const dniForm = document.getElementById("dni-form");
+        const dniInput = document.getElementById("dni");
 
         form.addEventListener("submit", async function (event) {
             // 1) Evitar que el formulario recargue la página (comportamiento por defecto)
@@ -38,6 +46,32 @@
                 const response = await fetch(url, { method: "GET" });
 
                 // 5) Parsear JSON; si el proxy devolvió error o texto no JSON, fallará aquí
+                const data = await response.json();
+                console.log(data);
+            } catch (error) {
+                console.error(error);
+            }
+        });
+
+        dniForm.addEventListener("submit", async function (event) {
+            // 1) Evitar recarga por submit
+            event.preventDefault();
+
+            // 2) Leer el DNI del input y validar
+            const dni = dniInput.value.trim();
+            if (!dni) return;
+
+            /*
+             * 3) Llamar al proxy del backend para RENIEC/DNI (mismo origen).
+             *    El servidor (app.js) se encarga de llamar a Decolecta con el token.
+             */
+            const url = "/api/reniec/dni?numero=" + encodeURIComponent(dni);
+
+            try {
+                // 4) GET sin Authorization (token solo en backend)
+                const response = await fetch(url, { method: "GET" });
+
+                // 5) Parsear y mostrar en consola
                 const data = await response.json();
                 console.log(data);
             } catch (error) {

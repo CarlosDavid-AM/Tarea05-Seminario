@@ -92,6 +92,52 @@ app.get("/api/sunat/ruc", async (req, res) => {
   }
 });
 
+/*
+ * PROXY hacia Decolecta: RENIEC/DNI
+ *
+ * Mantiene la misma idea que /api/sunat/ruc:
+ * - El navegador llama a tu servidor (mismo origen) → no hay bloqueo CORS.
+ * - El servidor llama a api.decolecta.com con el Bearer (token oculto al cliente).
+ */
+app.get("/api/reniec/dni", async (req, res) => {
+  // Paso A: Leer el DNI que el front envía como ?numero=...
+  const numero = req.query.numero;
+  if (!numero || typeof numero !== "string") {
+    return res.status(400).json({ error: "Falta el query ?numero=" });
+  }
+
+  // Paso B: Token solo en backend
+  const token = process.env.DECOLECTA_API_TOKEN;
+  if (!token) {
+    return res.status(500).json({
+      error:
+        "Configura la variable de entorno DECOLECTA_API_TOKEN con tu token de Decolecta.",
+    });
+  }
+
+  // Paso C: URL upstream a RENIEC
+  const upstreamUrl = `https://api.decolecta.com/v1/reniec/dni?numero=${numero}`;
+
+  try {
+    // Paso D: Llamada servidor-a-servidor (sin CORS del navegador)
+    const upstream = await fetch(upstreamUrl, {
+      method: "GET",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    // Paso E: Reenviar respuesta
+    const body = await upstream.text();
+    const contentType =
+      upstream.headers.get("content-type") || "application/json";
+    res.status(upstream.status).type(contentType).send(body);
+  } catch (err) {
+    res.status(500).json({
+      error: "No se pudo contactar a Decolecta",
+      detail: err?.message ?? String(err),
+    });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server corriendo en: http://localhost:${PORT}`);
 });
