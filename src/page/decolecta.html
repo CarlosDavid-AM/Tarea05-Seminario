@@ -7,5 +7,43 @@
 </head>
 <body>
     <h1>Decolecta</h1>
+
+    <form id="ruc-form">
+        <label for="ruc">RUC:</label>
+        <input id="ruc" name="ruc" type="text" required />
+        <button type="submit">Fetch</button>
+    </form>
+
+    <script>
+        const form = document.getElementById("ruc-form");
+        const rucInput = document.getElementById("ruc");
+
+        form.addEventListener("submit", async function (event) {
+            // 1) Evitar que el formulario recargue la página (comportamiento por defecto)
+            event.preventDefault();
+
+            // 2) Leer el RUC del input y ignorar envíos vacíos
+            const ruc = rucInput.value.trim();
+            if (!ruc) return;
+
+            /*
+             * 3) Llamar a NUESTRO servidor en /api/sunat/ruc (mismo origen: localhost:3000).
+             *    Por qué: así el navegador no bloquea por CORS (no cruzas a otro dominio).
+             *    El servidor (app.js) es quien llama a api.decolecta.com con el token.
+             */
+            const url = "/api/sunat/ruc?numero=" + encodeURIComponent(ruc);
+
+            try {
+                // 4) GET sin Authorization aquí: el token vive solo en el backend
+                const response = await fetch(url, { method: "GET" });
+
+                // 5) Parsear JSON; si el proxy devolvió error o texto no JSON, fallará aquí
+                const data = await response.json();
+                console.log(data);
+            } catch (error) {
+                console.error(error);
+            }
+        });
+    </script>
 </body>
 </html>
