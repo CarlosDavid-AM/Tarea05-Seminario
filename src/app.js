@@ -16,25 +16,25 @@ app.use(
     origin: "*",
     methods: "GET, POST, HEAD, PUT, PATCH, DELETE",
     credentials: true,
-  })
+  }),
 );
 
 const PORT = process.env.PORT || 3000;
 app.use(express.json());
 
 // Servir archivos estáticos
-app.use(express.static(path.join(__dirname, "../src/page")));
+app.use(express.static(path.join(__dirname, "../public/page")));
 
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "../src/page", "index.html"));
+  res.sendFile(path.join(__dirname, "../public/page", "index.html"));
 });
 
 app.get("/grafico", (req, res) => {
-  res.sendFile(path.join(__dirname, "../src/page", "grafico.html"));
+  res.sendFile(path.join(__dirname, "../public/page", "grafico.html"));
 });
 
 app.get("/decolecta", (req, res) => {
-  res.sendFile(path.join(__dirname, "../src/page", "decolecta.html"));
+  res.sendFile(path.join(__dirname, "../public/page", "decolecta.html"));
 });
 
 /*
